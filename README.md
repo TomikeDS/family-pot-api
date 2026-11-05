@@ -38,22 +38,45 @@ family-pot-docs for why, and when that could change.
 
 Requirements: Node 22+, pnpm, Docker (for Postgres).
 
-\`\`\`bash
+```bash
 git clone https://github.com/family-pot/family-pot-api.git
 cd family-pot-api
 pnpm install
 cp .env.example .env.local
 docker compose up -d db
 pnpm start:dev        # http://localhost:4000
-\`\`\`
+```
 
 Run everything CI runs:
 
-\`\`\`bash
+```bash
 pnpm check   # format:check, lint, typecheck, test, build
-\`\`\`
+```
 
 API docs available at `/api/docs` (Swagger) once the server is running.
+
+## Environment variables
+
+Configuration is loaded from `.env.local` and `.env` (in that order), validated once at
+startup, and exposed through the typed `AppConfigService`. The process exits non-zero and
+lists every invalid variable before it starts listening.
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `PORT` | No | `4000` | HTTP port, an integer from 1 to 65535 |
+| `NODE_ENV` | No | `development` | `development`, `test` or `production` |
+| `DATABASE_URL` | Yes | — | Postgres URL, for example `postgres://user:password@localhost:5432/family_pot` |
+| `DATABASE_URL_TEST` | No | — | Postgres URL used by integration tests |
+| `DATABASE_SSL` | No | `false` | `true` to require TLS for the database connection |
+| `CORS_ORIGIN` | No | empty | Comma-separated allowed browser origins such as `http://localhost:3000` |
+| `JWT_ACCESS_SECRET` | Yes | — | At least 32 characters; generate a random value and keep it secret |
+| `JWT_ACCESS_TTL` | No | `15m` | Access-token lifetime such as `30s`, `15m`, `1h` or `7d` |
+| `REFRESH_TOKEN_TTL_DAYS` | No | `7` | Refresh-token lifetime in whole days (1–365) |
+| `ALLOW_REMOTE_DB_RESET` | No | `false` | Allows destructive resets outside local development |
+
+For local Postgres, the `DATABASE_URL` usually looks like
+`postgres://family_pot:family_pot@localhost:5432/family_pot`. Never commit `.env*` files;
+only `.env.example` belongs in the repository.
 
 ## Contributing
 
